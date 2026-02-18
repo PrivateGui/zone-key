@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Key Generator</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    height: 100vh;
+    background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #0f2027);
+    background-size: 400% 400%;
+    animation: gradientFlow 15s ease infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+@keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.glow-bg {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(0,255,255,0.3) 0%, transparent 60%);
+    filter: blur(120px);
+    animation: float 8s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%,100% { transform: translateY(0px); }
+    50% { transform: translateY(-40px); }
+}
+
+.card {
+    backdrop-filter: blur(25px);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 50px 40px;
+    width: 90%;
+    max-width: 450px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(0,255,255,0.2);
+    transition: 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 0 60px rgba(0,255,255,0.35);
+}
+
+h1 {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+.description {
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+button {
+    background: linear-gradient(90deg, #00f5ff, #8f00ff);
+    border: none;
+    padding: 14px 30px;
+    border-radius: 12px;
+    font-weight: 600;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    box-shadow: 0 0 20px rgba(0,255,255,0.5);
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 35px rgba(0,255,255,0.8);
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+.key-box {
+    margin-top: 30px;
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.key-box:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+.key-text {
+    color: #00f5ff;
+    font-weight: 600;
+    letter-spacing: 2px;
+    font-size: 18px;
+}
+
+.status {
+    margin-top: 15px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+}
+</style>
+</head>
+
+<body>
+
+<div class="glow-bg"></div>
+
+<div class="card">
+    <h1>Generate Access Key</h1>
+    <p class="description">Click the button below to receive your unique key.</p>
+
+    <button id="generateBtn">Generate Key</button>
+
+    <div class="key-box" id="keyBox">
+        <span class="key-text" id="keyText"></span>
+    </div>
+
+    <div class="status" id="status"></div>
+</div>
+
+<script>
+const btn = document.getElementById("generateBtn");
+const keyBox = document.getElementById("keyBox");
+const keyText = document.getElementById("keyText");
+const statusText = document.getElementById("status");
+
+btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    btn.innerText = "Generating...";
+    statusText.innerText = "Contacting server...";
+
+    try {
+        const response = await fetch("https://tight-moon-ea2e.xavier-memesfunny.workers.dev/getkey");
+        const data = await response.json();
+
+        if (data.success) {
+            keyText.innerText = data.key;
+            keyBox.style.display = "block";
+            statusText.innerText = "Click the key to copy.";
+        } else {
+            statusText.innerText = "Failed to generate key.";
+        }
+
+    } catch (error) {
+        statusText.innerText = "Server error. Try again.";
+    }
+
+    btn.disabled = false;
+    btn.innerText = "Generate Key";
+});
+
+keyBox.addEventListener("click", () => {
+    navigator.clipboard.writeText(keyText.innerText);
+    statusText.innerText = "Key copied to clipboard!";
+});
+</script>
+
+</body>
+</html>
