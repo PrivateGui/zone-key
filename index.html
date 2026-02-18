@@ -348,10 +348,17 @@
     currentKey = null;
 
     try {
-      const res = await fetch('https://tight-moon-ea2e.xavier-memesfunny.workers.dev/getkey');
+      const res = await fetch('https://tight-moon-ea2e.xavier-memesfunny.workers.dev/getkey', {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'omit'
+      });
+
+      if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+
       const data = await res.json();
 
-      if (data.success && data.key) {
+      if (data.success === true && data.key) {
         currentKey = data.key;
         keyText.className = 'key-text';
         keyText.textContent = data.key;
@@ -361,12 +368,13 @@
         copyBtn.classList.remove('copied');
         showToast('✦ Key generated successfully');
       } else {
-        throw new Error('Invalid response');
+        throw new Error('API returned failure');
       }
     } catch (e) {
+      console.error('[KeyVault]', e);
       keyText.className = 'key-text placeholder';
       keyText.textContent = '— error, try again —';
-      showToast('⚠ Could not fetch key. Retry.');
+      showToast('⚠ ' + (e.message || 'Could not fetch key'));
     } finally {
       btn.classList.remove('loading');
     }
